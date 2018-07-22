@@ -29,7 +29,7 @@ function chatName(chatDiv) {
 }
 
 function selectChat(chatDiv){
-	triggerMouseEvent(chatDiv, "mousedown");
+	triggerMouseEvent(chatDiv[0], "mousedown");
 }
 
 function getMessageDivs() {
