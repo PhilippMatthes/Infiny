@@ -2,40 +2,53 @@ var jq = document.createElement('script');
 jq.src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js";
 document.getElementsByTagName('head')[0].appendChild(jq);
 
+
+function getQRCodeBase64() {
+	return $("#app > div > div > div._2NbD3 > div > div.XSdna > div > img").attr("src");
+}
+
+function getChatDivs() {
+	return $("#pane-side > div > div > div > div > div > div");
+}
+
+function chatName(chatDiv) {
+	let groupChatName = $(chatDiv).find("._25Ooe > ._1wjpf").attr("title");
+	let contactChatName = $(chatDiv).find("._25Ooe > ._3TEwt > ._1wjpf").attr("title");
+	if (typeof groupChatName != 'undefined') {return groupChatName;}
+	else return contactChatName;
+}
+
+function chatMessage(chatDiv) {
+	let sender = $(chatDiv).find("div._3j7s9 > div._1AwDx > div._itDl > span > span._1bX-5 > span").text();
+	let text = $(chatDiv).find("div._3j7s9 > div._1AwDx > div._itDl > span").attr("title");
+	return sender + ": " + text;
+}
+
+function chatImage(chatDiv) {
+	return $(chatDiv).find("div.dIyEr > div > img").attr("src");
+}
+
+function getAllChats() {
+	return $.map( getChatDivs(), function( val, i ) {
+  		return  {
+			message: chatMessage(val),
+			name: chatName(val),
+			img: chatImage(val),
+		};
+	});
+}
+
+
+// Chat
+
 function triggerMouseEvent(node, eventType) {
     var event = document.createEvent('MouseEvents');
     event.initEvent(eventType, true, true);
     node.dispatchEvent(event);
 }
 
-function getQRCodeBase64() {
-	return $("#app > div > div > div._2NbD3 > div > div.XSdna > div > img").attr("src");
-}
-
-function getGroupChatDivs() {
-    return $("#side > div > div > div").find("._25Ooe > ._1wjpf");
-}
-
-function getContactChatDivs() {
-	return $("#side > div > div > div").find("._25Ooe > ._3TEwt > ._1wjpf");
-}
-
-function getAllChatDivs() {
-	return $.merge(getGroupChatDivs(), getContactChatDivs());
-}
-
-function chatName(chatDiv) {
-	return $(chatDiv).text();
-}
-
-function getAllChatNames() {
-	return $.map( getAllChatDivs(), function( val, i ) {
-  		return chatName(val);
-	});
-}
-
 function selectChat(chatDiv){
-	triggerMouseEvent(chatDiv[0], "mousedown");
+	triggerMouseEvent(chatDiv, "mousedown");
 }
 
 function getMessageDivs() {
@@ -46,6 +59,12 @@ function getMessageFromDiv(messageDiv) {
 	let caption = $(messageDiv).find("div.KYpDv._3zdTI._1tq8Y.copyable-text > div > div._1RiwZ > div > span > a").text();
 	let message = $(messageDiv).find("div.copyable-text > div > span").text()
 	return caption + message;
+}
+
+function getAllMessages() {
+	return $.map( getMessageDivs(), function( val, i ) {
+		return getMessageFromDiv(val);
+	});
 }
 
 function getSenderFromDiv(messageDiv) {
