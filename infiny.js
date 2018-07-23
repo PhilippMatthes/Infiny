@@ -28,6 +28,12 @@ function chatName(chatDiv) {
 	return $(chatDiv).text();
 }
 
+function getAllChatNames() {
+	return $.map( getAllChatDivs(), function( val, i ) {
+  		return chatName(val);
+	});
+}
+
 function selectChat(chatDiv){
 	triggerMouseEvent(chatDiv[0], "mousedown");
 }
