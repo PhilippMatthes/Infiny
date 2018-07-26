@@ -75,31 +75,75 @@ function selectChat(chatDiv){
 }
 
 function getMessageDivs() {
-    return $("#main > div._3zJZ2 > div > div > div._9tCEa > div > div");
+    return $("#main > div._3zJZ2 > div > div > div._9tCEa > div");
 }
 
 function getMessageFromDiv(messageDiv) {
-    let caption = $(messageDiv).find("div.KYpDv._3zdTI._1tq8Y.copyable-text > div > div._1RiwZ > div > span > a").text();
-    let message = $(messageDiv).find("div.copyable-text > div > span").text()
-    return caption + message;
+	var message = "";
+	$.each( $(messageDiv).find("div.copyable-text > div > span").contents(), function( index, ele ) {
+		let alt = $(ele).attr("alt");
+		if (alt !== undefined) {
+			message += $(ele).attr("alt");
+		}
+		message += $(ele).text();
+	});
+    return {
+		caption: $(messageDiv).find("div.KYpDv._3zdTI._1tq8Y.copyable-text > div > div._1RiwZ > div > span > a").text(),
+		message: message,
+		system: $(messageDiv).find("div._3_7SH.Zq3Mc > span").text(),
+	};
 }
 
 function selectChatWithName(name) {
-	$.each( getChatDivs(), function( index, value ) {
-		if (chatName(value) === name) {
-			selectChat(value);
+	$.each( getChatDivs(), function( index, ele ) {
+		if (chatName(ele) === name) {
+			selectChat(ele);
 		}
 	});
 }
 
 function getAllCurrentlyShowingMessages() {
     return $.map( getMessageDivs(), function( val, i ) {
-                 return getMessageFromDiv(val);
-                 });
+		return {
+			message: getMessageFromDiv(val),
+			author: getSenderFromDiv(val),
+		}
+	});
+}
+
+function getAllCurrentlyShowingMessagesAsJson() {
+    return JSON.stringify(getAllCurrentlyShowingMessages());
 }
 
 function getSenderFromDiv(messageDiv) {
-    return $(messageDiv).find("div._111ze > span").text();
+    return {
+		own: $(messageDiv).find("div.message-out").length > 0,
+		quote: {
+			message: $(messageDiv).find("span.quoted-mention").text(),
+			number: $(messageDiv).find("div > div > div > div > div._111ze > span.RZ7GO").text(),
+			numberColor: rgb2hex($(messageDiv).find("div > div > div > div > div._111ze > span.RZ7GO").css("color")),
+			name: $(messageDiv).find("div > div > div >div > div._111ze > span._3Ye_R").text(),
+			contact: $(messageDiv).find("div > div > div > div > div._111ze > span._2a1Yw").text(),
+			contactColor: rgb2hex($(messageDiv).find("div > div > div > div > div._111ze > span._2a1Yw").css("color")),
+		},
+		number: $(messageDiv).find("div._111ze > span.RZ7GO").text(),
+		numberColor: rgb2hex($(messageDiv).find("div._111ze > span.RZ7GO").css("color")),
+		name: $(messageDiv).find("div._111ze > span._3Ye_R").text(),
+		contact: $(messageDiv).find("div._111ze > span._2a1Yw._1OmDL").text(),
+		contactColor: rgb2hex($(messageDiv).find("div._111ze > span._2a1Yw").css("color")),
+	};
+}
+
+function rgb2hex(rgb) {
+	if (rgb === undefined) return undefined;
+	
+    if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
+
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 }
 
 function sendMessage(text){
