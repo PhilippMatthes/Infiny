@@ -5,7 +5,6 @@ document.getElementsByTagName('head')[0].appendChild(jq);
 function confirmLoginOnThisDevice() {
     let button = $("#app > div > div > div > div > div > div > div._3QNwO > div._1WZqU.PNlAR");
     let buttonExists = button.length != 0;
-    console.log(button);
     if (buttonExists) {
         button.click();
     }
@@ -24,16 +23,6 @@ function getChatDivs() {
 			return aHeight - bHeight;
 		}
     );
-}
-
-function getTransform(el) {
-    var results = $(el).css('-webkit-transform').match(/matrix(?:(3d)\(\d+(?:, \d+)*(?:, (\d+))(?:, (\d+))(?:, (\d+)), \d+\)|\(\d+(?:, \d+)*(?:, (\d+))(?:, (\d+))\))/)
-
-    if(!results) return [0, 0, 0];
-    if(results[1] == '3d') return results.slice(2,5);
-
-    results.push(0);
-    return results.slice(5, 8);
 }
 
 function chatName(chatDiv) {
@@ -57,13 +46,18 @@ function chatImage(chatDiv) {
     return $(chatDiv).find("div.dIyEr > div > img").attr("src");
 }
 
+function chatDate(chatDiv) {
+	return $(chatDiv).find("div._3j7s9 > div._2FBdJ > div._3Bxar > span").text();
+}
+
 function getAllChats() {
     return $.map( getChatDivs(), function( val, i ) {
-                 return  {
-                 message: chatMessage(val),
-                 name: chatName(val),
-                 };
-                 });
+    	return  {
+			message: chatMessage(val),
+			name: chatName(val),
+			date: chatDate(val),
+		};
+	});
 }
 
 function getAllChatsAsJson() {
