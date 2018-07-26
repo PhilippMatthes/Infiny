@@ -64,9 +64,6 @@ function getAllChatsAsJson() {
     return JSON.stringify(getAllChats());
 }
 
-
-// Chat
-
 function triggerMouseEvent(node, eventType) {
     var event = document.createEvent('MouseEvents');
     event.initEvent(eventType, true, true);
@@ -87,7 +84,15 @@ function getMessageFromDiv(messageDiv) {
     return caption + message;
 }
 
-function getAllMessages() {
+function selectChatWithName(name) {
+	$.each( getChatDivs(), function( index, value ) {
+		if (chatName(value) === name) {
+			selectChat(value);
+		}
+	});
+}
+
+function getAllCurrentlyShowingMessages() {
     return $.map( getMessageDivs(), function( val, i ) {
                  return getMessageFromDiv(val);
                  });
